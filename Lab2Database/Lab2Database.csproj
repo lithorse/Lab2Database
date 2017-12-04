@@ -49,13 +49,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\201712041013231_InitialCreate.cs" />
-    <Compile Include="Migrations\201712041013231_InitialCreate.Designer.cs">
-      <DependentUpon>201712041013231_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\201712041347464_Test.cs" />
+    <Compile Include="Migrations\201712041347464_Test.Designer.cs">
+      <DependentUpon>201712041347464_Test.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201712041214064_Adds scores.cs" />
-    <Compile Include="Migrations\201712041214064_Adds scores.Designer.cs">
-      <DependentUpon>201712041214064_Adds scores.cs</DependentUpon>
+    <Compile Include="Migrations\201712041354002_Adds seed.cs" />
+    <Compile Include="Migrations\201712041354002_Adds seed.Designer.cs">
+      <DependentUpon>201712041354002_Adds seed.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712041356279_Empty ctor.cs" />
+    <Compile Include="Migrations\201712041356279_Empty ctor.Designer.cs">
+      <DependentUpon>201712041356279_Empty ctor.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
@@ -66,11 +70,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201712041013231_InitialCreate.resx">
-      <DependentUpon>201712041013231_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201712041347464_Test.resx">
+      <DependentUpon>201712041347464_Test.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712041214064_Adds scores.resx">
-      <DependentUpon>201712041214064_Adds scores.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201712041354002_Adds seed.resx">
+      <DependentUpon>201712041354002_Adds seed.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712041356279_Empty ctor.resx">
+      <DependentUpon>201712041356279_Empty ctor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

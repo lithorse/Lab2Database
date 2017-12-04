@@ -7,13 +7,13 @@ namespace Lab2Database.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class Addsscores : IMigrationMetadata
+    public sealed partial class Emptyctor : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Addsscores));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Emptyctor));
         
         string IMigrationMetadata.Id
         {
-            get { return "201712041214064_Adds scores"; }
+            get { return "201712041356279_Empty ctor"; }
         }
         
         string IMigrationMetadata.Source

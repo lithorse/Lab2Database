@@ -10,15 +10,29 @@ namespace Lab2Database.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
-            ContextKey = "Lab2Database.GameContext";
         }
 
         protected override void Seed(Lab2Database.GameContext context)
         {
-            //  This method will be called after migrating to the latest version.
+            Player p1 = new Player("Otto");
+            Player p2 = new Player("Rikard");
+            Player p3 = new Player("David");
 
-            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
-            //  to avoid creating duplicate seed data.
+            context.Players.AddOrUpdate(p1);
+            context.Players.AddOrUpdate(p2);
+            context.Players.AddOrUpdate(p3);
+
+            Course c1 = new Course("Cool Land", 6);
+            Course c2 = new Course("Pretty World", 5);
+            Course c3 = new Course("Radical City", 7);
+
+            context.Courses.AddOrUpdate(c1);
+            context.Courses.AddOrUpdate(c2);
+            context.Courses.AddOrUpdate(c3);
+
+            context.Scores.AddOrUpdate(new Score(4, p1, c2));
+            context.Scores.AddOrUpdate(new Score(5, p2, c1));
+            context.Scores.AddOrUpdate(new Score(4, p3, c3));
         }
     }
 }
