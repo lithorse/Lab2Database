@@ -61,6 +61,10 @@
     <Compile Include="Migrations\201712041356279_Empty ctor.Designer.cs">
       <DependentUpon>201712041356279_Empty ctor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712051044179_Moves to MovesLeft.cs" />
+    <Compile Include="Migrations\201712051044179_Moves to MovesLeft.Designer.cs">
+      <DependentUpon>201712051044179_Moves to MovesLeft.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,6 +82,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712041356279_Empty ctor.resx">
       <DependentUpon>201712041356279_Empty ctor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712051044179_Moves to MovesLeft.resx">
+      <DependentUpon>201712051044179_Moves to MovesLeft.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
