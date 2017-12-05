@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Lab2Database
@@ -20,8 +22,9 @@ namespace Lab2Database
         {
             while (true)
             {
+                Console.Clear();
                 Console.WriteLine("What do you want to do?");
-                Console.WriteLine("1: Enter Name\n2: Print Players\n3: Print Courses\n4: Print Scores\n5: Quit");
+                Console.WriteLine("1: Enter Name\n2: Print Players\n3: Print Courses\n4: Print Scores\n5: Create New Course\n6: Quit");
                 string input = "";
                 input = Console.ReadLine();
                 switch (input)
@@ -39,6 +42,9 @@ namespace Lab2Database
                         PrintScores(context);
                         break;
                     case "5":
+                        NewCourse(context);
+                        break;
+                    case "6":
                         return;
                     default:
                         Console.Clear();
@@ -53,75 +59,84 @@ namespace Lab2Database
             Console.Clear();
             Console.WriteLine("Please enter name:");
             string name = Console.ReadLine();
-            Console.Clear();
-            Console.WriteLine($"Checking database for {name}...");
-            var query = from player in context.Players
-                        select player;
-            bool nameFound = false;
-            int playerId = -1;
-            foreach (var player in query)
+
+            Match match = Regex.Match(name, @"^[a-zA-ZåäöÅÄÖ]*$");
+            if (match.Success)
             {
-                if (player.Name == name)
+                name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name.ToLower());
+                Console.Clear();
+                Console.WriteLine($"Checking database for {name}...");
+                var query = from player in context.Players
+                            select player;
+                bool nameFound = false;
+                int playerId = -1;
+                foreach (var player in query)
                 {
-                    nameFound = true;
-                    playerId = player.PlayerId;
+                    if (player.Name == name)
+                    {
+                        nameFound = true;
+                        playerId = player.PlayerId;
+                    }
                 }
+                if (nameFound)
+                    PlayerMenu(context, name, playerId);
+                else
+                    NewPlayer(context, name);
             }
-            if (nameFound)
-                PlayerMenu(context, name, playerId);
-            else
-                NewPlayer(context, name);
         }
 
         public static void PlayerMenu(GameContext context, string name, int playerId)
         {
-            Console.Clear();
-            Console.WriteLine("Collecting your stats...");
-            bool hasScores = (from score in context.Scores where score.Player.PlayerId == playerId select score).Count() > 0;
-            Console.Clear();
-            Console.WriteLine($"Welcome {name}!");
-            Console.WriteLine();
-            if (hasScores)
+            while (true)
             {
-                var query = from score in context.Scores
-                            join course in context.Courses on
-                            score.Course equals course
-                            where score.Player.PlayerId == playerId
-                            select score.ScoreId + "  " + course.Name + "\t" + (course.Birds - score.MovesLeft) + "\t" + score.MovesLeft;
-                Console.WriteLine("Here are your scores on courses you have beaten:");
-                Console.WriteLine("Id  Course\tMoves\t\tMoves Left");
-                foreach (var scores in query)
+                Console.Clear();
+                Console.WriteLine("Collecting your stats...");
+                bool hasScores = (from score in context.Scores where score.Player.PlayerId == playerId select score).Count() > 0;
+                Console.Clear();
+                Console.WriteLine($"Welcome {name}!");
+                Console.WriteLine();
+                if (hasScores)
                 {
-                    Console.WriteLine(scores);
+                    var query = from score in context.Scores
+                                join course in context.Courses on
+                                score.Course equals course
+                                where score.Player.PlayerId == playerId
+                                select score.ScoreId + "  " + course.Name + "\t" + (course.Birds - score.MovesLeft) + "\t" + score.MovesLeft;
+                    Console.WriteLine("Here are your scores on courses you have beaten:");
+                    Console.WriteLine("Id  Course\t\tMoves\tMoves Left");
+                    foreach (var scores in query)
+                    {
+                        Console.WriteLine(scores);
+                    }
+                    Console.WriteLine();
+                    Console.WriteLine($"Total score: {(from score in context.Scores where score.Player.PlayerId == playerId select score.MovesLeft).Sum()}");
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
-                Console.WriteLine($"Total score: {(from score in context.Scores where score.Player.PlayerId == playerId select score.MovesLeft).Sum()}");
-                Console.WriteLine();
-            }
-            else
-            {
-                Console.WriteLine("You have not beaten any courses!");
-                Console.WriteLine();
-            }
-            Console.WriteLine("What do you want to do?");
-            Console.WriteLine("1: Update score\n2: Add new course\n3: Return to previous menu");
-            string input = "";
-            input = Console.ReadLine();
-            switch (input)
-            {
-                case "1":
-                    UpdateScore(context, playerId);
-                    break;
-                case "2":
-                    PrintPlayers(context);
-                    break;
-                case "3":
-                    PrintCourses(context);
-                    break;
-                default:
-                    Console.Clear();
-                    Console.WriteLine(input + " is not a recognized input");
-                    break;
+                else
+                {
+                    Console.WriteLine("You have not beaten any courses!");
+                    Console.WriteLine();
+                }
+                Console.WriteLine("What do you want to do?");
+                Console.WriteLine("1: Update score\n2: Add new course\n3: Return to previous menu");
+                string input = "";
+                input = Console.ReadLine();
+                switch (input)
+                {
+                    case "1":
+                        UpdateScore(context, playerId);
+                        break;
+                    case "2":
+                        PrintPlayers(context);
+                        break;
+                    case "3":
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.Clear();
+                        Console.WriteLine(input + " is not a recognized input");
+                        break;
+                }
             }
         }
         public static void NewPlayer(GameContext context, string name)
@@ -137,6 +152,77 @@ namespace Lab2Database
             PlayerMenu(context, name, playerId);
         }
 
+        public static void NewCourse(GameContext context)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("Please enter course name:");
+                string courseName = Console.ReadLine();
+
+                Match match = Regex.Match(courseName, @"^[a-zA-ZåäöÅÄÖ\s]*$");
+                if (match.Success)
+                {
+                    courseName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(courseName.ToLower());
+                    Console.Clear();
+                    Console.WriteLine($"Checking database for {courseName}...");
+                    var query = from Course in context.Courses
+                                select Course;
+                    bool CourseNameFound = false;
+                    int courseId = -1;
+                    foreach (var course in query)
+                    {
+                        if (course.Name == courseName)
+                        {
+                            CourseNameFound = true;
+                            courseId = course.CourseId;
+                        }
+                    }
+                    if (CourseNameFound)
+                    {
+                        Console.Clear();
+                        Console.WriteLine($"A course named {courseName} already exists");
+                        Console.WriteLine("Please press any key to continue");
+                        Console.ReadKey();
+                    }
+                    else
+                    {
+                        int birds;
+                        while (true)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Please enter the number of birds available on the course, atleast 1");
+                            try
+                            {
+                                birds = Int32.Parse(Console.ReadLine());
+                                if (birds > 0)
+                                {
+                                    context.Courses.Add(new Course(courseName, birds));
+                                    context.SaveChanges();
+                                    return;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Must have atleast 1 bird");
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                Console.WriteLine("Incorrect amount or format");
+                            }
+
+                        }
+                    }
+
+                }
+                else
+                {
+                    Console.WriteLine("Invalid course name");
+                    Console.ReadKey();
+                }
+            }
+        }
+
         public static void UpdateScore(GameContext context, int playerId)
         {
             Console.Clear();
@@ -150,26 +236,81 @@ namespace Lab2Database
                 Console.WriteLine(course.CourseId + " " + course.Name);
             }
             Console.WriteLine();
-            int input = -1;
+            int inputCourseId = -1;
             try
             {
-                input = Int32.Parse(Console.ReadLine());
+                inputCourseId = Int32.Parse(Console.ReadLine());
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return;
             }
-            bool validCourseId = (from course in context.Courses where course.CourseId == input select course).Count() == 1;
+            bool validCourseId = (from course in context.Courses where course.CourseId == inputCourseId select course).Count() == 1;
             if (validCourseId)
             {
-                Console.WriteLine($"What will your new score be? Maximum is {(from course in context.Courses where course.CourseId == input select course.Birds).Single()}");
-                Console.ReadLine();
+                var query2 = from score in context.Scores where score.Player.PlayerId == playerId && score.Course.CourseId == inputCourseId select score;
+                bool hasScore = query2.Count() > 0;
+                int maxScore = (from course in context.Courses where course.CourseId == inputCourseId select course.Birds).Single() - 1;
+                if (hasScore)
+                {
+                    while (true)
+                    {
+
+                        Console.WriteLine($"What will your new score be? Maximum is {maxScore}");
+                        try
+                        {
+                            int inputScore = Int32.Parse(Console.ReadLine());
+                            if (inputScore <= maxScore && inputScore >= 0)
+                            {
+                                query2.Single().MovesLeft = inputScore;
+                                context.SaveChanges();
+                                Console.WriteLine($"Score updated to {inputScore}");
+                                Console.WriteLine("\t\tPress any key to return to main menu");
+                                Console.ReadKey();
+                                Console.Clear();
+                                break;
+                            }
+                            else
+                            {
+                                Console.Clear();
+                                Console.WriteLine($"Score must be between 0 and {maxScore}");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"What will your new score be? Maximum is {maxScore}");
+                    try
+                    {
+                        int inputScore = Int32.Parse(Console.ReadLine());
+                        context.Scores.Add(new Score(inputScore, FetchPlayer(playerId, context), FetchCourse(inputCourseId, context)));
+                        context.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        return;
+                    }
+                }
             }
             else
             {
-                Console.WriteLine($"Course with Id {input} does not exist");
+                Console.WriteLine($"Course with Id {inputCourseId} does not exist");
             }
+        }
+        public static Course FetchCourse(int courseId, GameContext context)
+        {
+            return (from course in context.Courses where course.CourseId == courseId select course).Single();
+        }
+        public static Player FetchPlayer(int playerId, GameContext context)
+        {
+            return (from player in context.Players where player.PlayerId == playerId select player).Single();
         }
 
         public static void PrintPlayers(GameContext context)
@@ -196,6 +337,7 @@ namespace Lab2Database
             Console.WriteLine("Loading Courses in Database...");
             var query = from course in context.Courses
                         select course;
+
             Console.Clear();
             Console.WriteLine("Current Courses in Database:");
             foreach (var course in query)
@@ -224,6 +366,23 @@ namespace Lab2Database
             foreach (var scores in query)
             {
                 Console.WriteLine(scores);
+            }
+
+            //var query2 = from score in context.Scores
+            //             join course in context.Courses on
+            //             score.Course.CourseId equals course.CourseId
+            //             join player in context.Players on
+            //             score.Player.PlayerId equals player.PlayerId
+            //             group score by score.Course.CourseId into idGroup
+            //             select idGroup;
+
+            foreach (var group in query2)
+            {
+                Console.WriteLine(group.Key);
+                foreach (var score in group)
+                {
+                    Console.WriteLine("     " + score.Player.Name);
+                }
             }
             Console.WriteLine();
             Console.WriteLine("Press any key to return to main menu");
