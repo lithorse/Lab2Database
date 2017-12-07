@@ -230,7 +230,7 @@ namespace Lab2Database
             var query = from course in context.Courses
                         select course;
             Console.Clear();
-            Console.WriteLine("Enter Id for course you wish to update your score for:");
+            Console.WriteLine("Enter Id for the course you wish to update your score for:");
             foreach (var course in query)
             {
                 Console.WriteLine(course.CourseId + " " + course.Name);
@@ -359,31 +359,29 @@ namespace Lab2Database
                         score.Course.CourseId equals course.CourseId
                         join player in context.Players on
                         score.Player.PlayerId equals player.PlayerId
+                        orderby score.Course.Name
                         select score.ScoreId + "  " + course.Name + "\t" + player.Name + "\t\t" + score.MovesLeft;
             Console.Clear();
             Console.WriteLine("Current Scores in Database:");
             Console.WriteLine("Id  Course\t\tPlayer\t\tScore");
+
             foreach (var scores in query)
             {
                 Console.WriteLine(scores);
             }
 
-            //var query2 = from score in context.Scores
-            //             join course in context.Courses on
-            //             score.Course.CourseId equals course.CourseId
-            //             join player in context.Players on
-            //             score.Player.PlayerId equals player.PlayerId
-            //             group score by score.Course.CourseId into idGroup
-            //             select idGroup;
-
-            foreach (var group in query2)
+            var query2 = (from score in context.Scores
+                          join course in context.Courses on score.Course.CourseId equals course.CourseId
+                          join player in context.Players on score.Player.PlayerId equals player.PlayerId
+                          group score by score.Course.CourseId into idGroup
+                          select idGroup).ToList();
+            Console.WriteLine("Highest score for each course");
+            foreach (var x in query2)
             {
-                Console.WriteLine(group.Key);
-                foreach (var score in group)
-                {
-                    Console.WriteLine("     " + score.Player.Name);
-                }
+                Console.WriteLine("\t" + x.Max().Course.Name);
+                Console.WriteLine(x.Max().Player.Name + " score: "+ x.Max().MovesLeft);
             }
+
             Console.WriteLine();
             Console.WriteLine("Press any key to return to main menu");
             Console.ReadKey();
@@ -455,7 +453,7 @@ namespace Lab2Database
         public virtual ICollection<Score> Scores { get; set; }
     }
 
-    public class Score
+    public class Score : IComparable<Score>
     {
         public Score()
         {
@@ -473,5 +471,10 @@ namespace Lab2Database
         public int MovesLeft { get; set; }
         public virtual Player Player { get; set; }
         public virtual Course Course { get; set; }
+
+        public int CompareTo(Score score)
+        {
+            return MovesLeft.CompareTo(score.MovesLeft);
+        }
     }
 }
