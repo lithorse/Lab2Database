@@ -101,7 +101,7 @@ namespace Lab2Database
                                 join course in context.Courses on
                                 score.Course equals course
                                 where score.Player.PlayerId == playerId
-                                select score.ScoreId + "  " + course.Name + "\t" + (course.Birds - score.MovesLeft) + "\t" + score.MovesLeft;
+                                select score.ScoreId + "\t" + course.Name + "\t" + (course.Birds - score.MovesLeft) + "\t" + score.MovesLeft;
                     Console.WriteLine("Here are your scores on courses you have beaten:");
                     Console.WriteLine("Id  Course\t\tMoves\tMoves Left");
                     foreach (var scores in query)
@@ -118,7 +118,7 @@ namespace Lab2Database
                     Console.WriteLine();
                 }
                 Console.WriteLine("What do you want to do?");
-                Console.WriteLine("1: Update score\n2: Add new course\n3: Return to previous menu");
+                Console.WriteLine("1: Update score/Add score\n2: Return to previous menu");
                 string input = "";
                 input = Console.ReadLine();
                 switch (input)
@@ -127,9 +127,6 @@ namespace Lab2Database
                         UpdateScore(context, playerId);
                         break;
                     case "2":
-                        PrintPlayers(context);
-                        break;
-                    case "3":
                         Console.Clear();
                         return;
                     default:
@@ -230,7 +227,7 @@ namespace Lab2Database
             var query = from course in context.Courses
                         select course;
             Console.Clear();
-            Console.WriteLine("Enter Id for the course you wish to update your score for:");
+            Console.WriteLine("Enter Id for the course you wish to update/add your score for:");
             foreach (var course in query)
             {
                 Console.WriteLine(course.CourseId + " " + course.Name);
@@ -270,7 +267,7 @@ namespace Lab2Database
                                 Console.ReadKey();
                                 Console.Clear();
                                 break;
-                            }
+                            } 
                             else
                             {
                                 Console.Clear();
@@ -285,17 +282,45 @@ namespace Lab2Database
                 }
                 else
                 {
-                    Console.WriteLine($"What will your new score be? Maximum is {maxScore}");
-                    try
+                    //Console.WriteLine($"What will your new score be? Maximum is {maxScore}");
+                    //try
+                    //{
+                    //    int inputScore = Int32.Parse(Console.ReadLine());
+                    //    context.Scores.Add(new Score(inputScore, FetchPlayer(playerId, context), FetchCourse(inputCourseId, context)));
+                    //    context.SaveChanges();
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine(e.Message);
+                    //    return;
+                    //}
+                    while (true)
                     {
-                        int inputScore = Int32.Parse(Console.ReadLine());
-                        context.Scores.Add(new Score(inputScore, FetchPlayer(playerId, context), FetchCourse(inputCourseId, context)));
-                        context.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                        return;
+
+                        Console.WriteLine($"What will your new score be? Maximum is {maxScore}");
+                        try
+                        {
+                            int inputScore = Int32.Parse(Console.ReadLine());
+                            if (inputScore <= maxScore && inputScore >= 0)
+                            {
+                                context.Scores.Add(new Score(inputScore, FetchPlayer(playerId, context), FetchCourse(inputCourseId, context)));
+                                context.SaveChanges();
+                                Console.WriteLine($"Score updated to {inputScore}");
+                                Console.WriteLine("\t\tPress any key to return to main menu");
+                                Console.ReadKey();
+                                Console.Clear();
+                                break;
+                            }
+                            else
+                            {
+                                Console.Clear();
+                                Console.WriteLine($"Score must be between 0 and {maxScore}");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
                     }
                 }
             }
@@ -375,7 +400,7 @@ namespace Lab2Database
                           join player in context.Players on score.Player.PlayerId equals player.PlayerId
                           group score by score.Course.CourseId into idGroup
                           select idGroup).ToList();
-            Console.WriteLine("Highest score for each course");
+            Console.WriteLine("\nHighest score for each course");
             foreach (var x in query2)
             {
                 Console.WriteLine("\t" + x.Max().Course.Name);
