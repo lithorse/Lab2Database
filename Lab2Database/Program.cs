@@ -385,10 +385,10 @@ namespace Lab2Database
                         join player in context.Players on
                         score.Player.PlayerId equals player.PlayerId
                         orderby score.Course.Name
-                        select score.ScoreId + "  " + course.Name + "\t" + player.Name + "\t\t" + score.MovesLeft;
+                        select score.ScoreId + "\t " + course.Name + "\t" + player.Name + "\t\t" + score.MovesLeft;
             Console.Clear();
-            Console.WriteLine("Current Scores in Database:");
-            Console.WriteLine("Id  Course\t\tPlayer\t\tScore");
+            Console.WriteLine("Current Scores in Database:          (Score is number of moves available minus moves used)");
+            Console.WriteLine("Id\t Course\t\tPlayer\t\tScore");
 
             foreach (var scores in query)
             {
