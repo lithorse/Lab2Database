@@ -60,28 +60,37 @@ namespace Lab2Database
             Console.WriteLine("Please enter name:");
             string name = Console.ReadLine();
 
-            Match match = Regex.Match(name, @"^[a-zA-ZåäöÅÄÖ]*$");
-            if (match.Success)
+            if (name.Length > 16)
             {
-                name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name.ToLower());
-                Console.Clear();
-                Console.WriteLine($"Checking database for {name}...");
-                var query = from player in context.Players
-                            select player;
-                bool nameFound = false;
-                int playerId = -1;
-                foreach (var player in query)
+                Console.WriteLine("Name too long.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+            }
+            else
+            {
+                Match match = Regex.Match(name, @"^[a-zA-ZåäöÅÄÖ]*$");
+                if (match.Success)
                 {
-                    if (player.Name == name)
+                    name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name.ToLower());
+                    Console.Clear();
+                    Console.WriteLine($"Checking database for {name}...");
+                    var query = from player in context.Players
+                                select player;
+                    bool nameFound = false;
+                    int playerId = -1;
+                    foreach (var player in query)
                     {
-                        nameFound = true;
-                        playerId = player.PlayerId;
+                        if (player.Name == name)
+                        {
+                            nameFound = true;
+                            playerId = player.PlayerId;
+                        }
                     }
+                    if (nameFound)
+                        PlayerMenu(context, name, playerId);
+                    else
+                        NewPlayer(context, name);
                 }
-                if (nameFound)
-                    PlayerMenu(context, name, playerId);
-                else
-                    NewPlayer(context, name);
             }
         }
 
@@ -157,65 +166,74 @@ namespace Lab2Database
                 Console.WriteLine("Please enter course name:");
                 string courseName = Console.ReadLine();
 
-                Match match = Regex.Match(courseName, @"^[a-zA-ZåäöÅÄÖ\s]*$");
-                if (match.Success)
+                if (courseName.Length > 32)
                 {
-                    courseName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(courseName.ToLower());
-                    Console.Clear();
-                    Console.WriteLine($"Checking database for {courseName}...");
-                    var query = from Course in context.Courses
-                                select Course;
-                    bool CourseNameFound = false;
-                    int courseId = -1;
-                    foreach (var course in query)
-                    {
-                        if (course.Name == courseName)
-                        {
-                            CourseNameFound = true;
-                            courseId = course.CourseId;
-                        }
-                    }
-                    if (CourseNameFound)
-                    {
-                        Console.Clear();
-                        Console.WriteLine($"A course named {courseName} already exists");
-                        Console.WriteLine("Please press any key to continue");
-                        Console.ReadKey();
-                    }
-                    else
-                    {
-                        int birds;
-                        while (true)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Please enter the number of birds available on the course, atleast 1");
-                            try
-                            {
-                                birds = Int32.Parse(Console.ReadLine());
-                                if (birds > 0)
-                                {
-                                    context.Courses.Add(new Course(courseName, birds));
-                                    context.SaveChanges();
-                                    return;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Must have atleast 1 bird");
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                Console.WriteLine("Incorrect amount or format");
-                            }
-
-                        }
-                    }
-
+                    Console.WriteLine("Name too long.");
+                    Console.WriteLine("Press any key to try again...");
+                    Console.ReadKey();
                 }
                 else
                 {
-                    Console.WriteLine("Invalid course name");
-                    Console.ReadKey();
+                    Match match = Regex.Match(courseName, @"^[a-zA-ZåäöÅÄÖ\s]*$");
+                    if (match.Success)
+                    {
+                        courseName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(courseName.ToLower());
+                        Console.Clear();
+                        Console.WriteLine($"Checking database for {courseName}...");
+                        var query = from Course in context.Courses
+                                    select Course;
+                        bool CourseNameFound = false;
+                        int courseId = -1;
+                        foreach (var course in query)
+                        {
+                            if (course.Name == courseName)
+                            {
+                                CourseNameFound = true;
+                                courseId = course.CourseId;
+                            }
+                        }
+                        if (CourseNameFound)
+                        {
+                            Console.Clear();
+                            Console.WriteLine($"A course named {courseName} already exists");
+                            Console.WriteLine("Please press any key to continue");
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            int birds;
+                            while (true)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Please enter the number of birds available on the course, atleast 1");
+                                try
+                                {
+                                    birds = Int32.Parse(Console.ReadLine());
+                                    if (birds > 0)
+                                    {
+                                        context.Courses.Add(new Course(courseName, birds));
+                                        context.SaveChanges();
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Must have atleast 1 bird");
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    Console.WriteLine("Incorrect amount or format");
+                                }
+
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid course name");
+                        Console.ReadKey();
+                    }
                 }
             }
         }
@@ -267,7 +285,7 @@ namespace Lab2Database
                                 Console.ReadKey();
                                 Console.Clear();
                                 break;
-                            } 
+                            }
                             else
                             {
                                 Console.Clear();
@@ -404,7 +422,7 @@ namespace Lab2Database
             foreach (var x in query2)
             {
                 Console.WriteLine("\t" + x.Max().Course.Name);
-                Console.WriteLine(x.Max().Player.Name + " score: "+ x.Max().MovesLeft);
+                Console.WriteLine(x.Max().Player.Name + " score: " + x.Max().MovesLeft);
             }
 
             Console.WriteLine();
