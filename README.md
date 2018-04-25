@@ -9,7 +9,7 @@ Making CRUD manipulations through Entity Framework, with Annotations and Fluent 
 Objective:
 - Learn Entity Framework
   - Annotation
-  - Learn Fluent API
+  - Fluent API
 
 
 Technologies used:
